@@ -18,4 +18,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FinMind.API\FinMind.API.csproj" />
+    <ProjectReference Include="..\FinMind.Application\FinMind.Application.csproj" />
+    <ProjectReference Include="..\FinMind.Domain\FinMind.Domain.csproj" />
+    <ProjectReference Include="..\FinMind.Infrastructure\FinMind.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
