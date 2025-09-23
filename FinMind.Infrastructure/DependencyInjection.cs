@@ -7,6 +7,7 @@ using FinMind.Application.Interfaces.Repositories;
 using FinMind.Application.Interfaces.Services;
 using FinMind.Infrastructure.Repositories;
 using FinMind.Infrastructure.Data;
+using FinMind.Infrastructure.Services;
 
 namespace FinMind.Infrastructure;
 
@@ -55,6 +56,9 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IBudgetRepository, BudgetRepository>();
         services.AddScoped<IGoalRepository, GoalRepository>();
+
+        // Registrar serviços
+        services.AddScoped<ISeedService, SeedService>();
 
         return services;
     }

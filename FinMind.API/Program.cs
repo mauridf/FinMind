@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using FinMind.API.Middleware;
 using FinMind.Application;
 using FinMind.Infrastructure;
+using FinMind.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,23 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// SEED AUTOMÁTICO (apenas desenvolvimento)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var seedService = scope.ServiceProvider.GetRequiredService<ISeedService>();
+
+    try
+    {
+        await seedService.SeedDataAsync();
+        Console.WriteLine("Seed automático executado com sucesso!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro no seed automático: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
