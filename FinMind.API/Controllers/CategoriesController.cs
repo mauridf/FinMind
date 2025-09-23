@@ -2,11 +2,13 @@
 using FinMind.Application.DTOs;
 using FinMind.Application.Services;
 using FinMind.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinMind.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly CategoryService _categoryService;

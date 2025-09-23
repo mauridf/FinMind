@@ -16,7 +16,8 @@ public class UserService
     public async Task<UserDto> GetUserByIdAsync(string id)
     {
         var user = await _userRepository.GetByIdAsync(id);
-        if (user == null) throw new ArgumentException("Usuário não encontrado");
+        if (user == null || !user.IsActive)
+            throw new ArgumentException("Usuário não encontrado");
 
         return MapToDto(user);
     }
@@ -27,11 +28,13 @@ public class UserService
         if (await _userRepository.ExistsByEmailAsync(createUserDto.Email))
             throw new InvalidOperationException("Email já está em uso");
 
-        // TODO: Adicionar hash de senha depois
+        // Criar hash da senha
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
+
         var user = new User
         {
             Email = createUserDto.Email,
-            PasswordHash = createUserDto.Password, // Temporário - vamos hash depois
+            PasswordHash = passwordHash,
             PersonalInfo = new Domain.ValueObjects.PersonalInfo
             {
                 Name = createUserDto.Name,
@@ -42,6 +45,56 @@ public class UserService
 
         var createdUser = await _userRepository.AddAsync(user);
         return MapToDto(createdUser);
+    }
+
+    public async Task<UserDto> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null || !user.IsActive)
+            throw new ArgumentException("Usuário não encontrado");
+
+        user.PersonalInfo.Name = updateUserDto.Name;
+        user.PersonalInfo.Phone = updateUserDto.Phone;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _userRepository.UpdateAsync(user);
+        return MapToDto(user);
+    }
+
+    public async Task DeleteUserAsync(string id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new ArgumentException("Usuário não encontrado");
+
+        // Soft delete
+        user.IsActive = false;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+    }
+
+    public async Task<bool> ValidatePasswordAsync(string userId, string password)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null || !user.IsActive)
+            return false;
+
+        return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+    }
+
+    public async Task ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null || !user.IsActive)
+            throw new ArgumentException("Usuário não encontrado");
+
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            throw new UnauthorizedAccessException("Senha atual incorreta");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _userRepository.UpdateAsync(user);
     }
 
     private static UserDto MapToDto(User user)

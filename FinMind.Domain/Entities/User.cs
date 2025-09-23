@@ -14,6 +14,9 @@ public class User : Entity
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
+
     public PersonalInfo PersonalInfo { get; set; } = new();
     public FinancialSettings FinancialSettings { get; set; } = new();
     public UserPreferences Preferences { get; set; } = new();
@@ -22,6 +25,32 @@ public class User : Entity
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastLogin { get; set; }
 
-    // Para soft delete
     public bool IsActive { get; set; } = true;
+
+    public void UpdateLastLogin()
+    {
+        LastLogin = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetRefreshToken(string refreshToken, int expiryDays)
+    {
+        RefreshToken = refreshToken;
+        RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void ClearRefreshToken()
+    {
+        RefreshToken = null;
+        RefreshTokenExpiry = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public bool IsRefreshTokenValid(string refreshToken)
+    {
+        return RefreshToken == refreshToken &&
+               RefreshTokenExpiry.HasValue &&
+               RefreshTokenExpiry.Value > DateTime.UtcNow;
+    }
 }

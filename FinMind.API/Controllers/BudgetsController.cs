@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FinMind.Application.DTOs;
 using FinMind.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinMind.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class BudgetsController : ControllerBase
 {
     private readonly BudgetService _budgetService;
