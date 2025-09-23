@@ -4,6 +4,7 @@ using FinMind.API.Middleware;
 using FinMind.Application;
 using FinMind.Infrastructure;
 using FinMind.Application.Interfaces.Services;
+using FinMind.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,20 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// INICIALIZAÇÃO DO MONGODB (deve ser a primeira coisa)
+try
+{
+    using var scope = app.Services.CreateScope();
+    var mongoInitializer = scope.ServiceProvider.GetRequiredService<MongoDbInitializer>();
+    await mongoInitializer.InitializeAsync();
+    Console.WriteLine("MongoDB inicializado com sucesso!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro ao inicializar MongoDB: {ex.Message}");
+    throw;
+}
 
 // SEED AUTOMÁTICO (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())

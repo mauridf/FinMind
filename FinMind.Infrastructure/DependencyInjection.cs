@@ -6,8 +6,8 @@ using System.Text;
 using FinMind.Application.Interfaces.Repositories;
 using FinMind.Application.Interfaces.Services;
 using FinMind.Infrastructure.Repositories;
-using FinMind.Infrastructure.Data;
 using FinMind.Infrastructure.Services;
+using FinMind.Infrastructure.Data;
 
 namespace FinMind.Infrastructure;
 
@@ -32,7 +32,10 @@ public static class DependencyInjection
             ExpirationMinutes = int.Parse(configuration["JwtSettings:ExpirationMinutes"] ?? "60"),
             RefreshTokenExpirationDays = int.Parse(configuration["JwtSettings:RefreshTokenExpirationDays"] ?? "7")
         };
-        services.AddSingleton<IJwtSettings>(jwtSettings); // Registrar como IJwtSettings
+        services.AddSingleton<IJwtSettings>(jwtSettings);
+
+        // Registrar MongoDbInitializer como singleton
+        services.AddSingleton<MongoDbInitializer>();
 
         // Configurar Autenticação JWT
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
