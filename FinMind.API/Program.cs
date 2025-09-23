@@ -65,7 +65,6 @@ builder.Services.AddSwaggerGen(c =>
         c.IncludeXmlComments(xmlPath);
     }
 
-    // Configurar exemplos e descrições
     c.EnableAnnotations();
 });
 
@@ -81,14 +80,6 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
-    });
-
-    options.AddPolicy("ProductionCors", policy =>
-    {
-        policy.WithOrigins("https://meusite.com", "https://www.meusite.com")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
     });
 });
 
@@ -111,11 +102,10 @@ catch (Exception ex)
 // SEED AUTOMÁTICO (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    var seedService = scope.ServiceProvider.GetRequiredService<ISeedService>();
-
     try
     {
+        using var scope = app.Services.CreateScope();
+        var seedService = scope.ServiceProvider.GetRequiredService<ISeedService>();
         await seedService.SeedDataAsync();
         Console.WriteLine("Seed automático executado com sucesso!");
     }
@@ -132,9 +122,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinMind API v1");
-        c.RoutePrefix = "api-docs"; // Acessar em /api-docs
+        c.RoutePrefix = "swagger"; // Mudar para "swagger" (padrão)
         c.DocumentTitle = "FinMind API Documentation";
+
+        // Configurações adicionais para melhor experiência
+        c.DefaultModelsExpandDepth(-1); // Ocultar schemas por padrão
+        c.DisplayRequestDuration();
+        c.EnableDeepLinking();
     });
+
+    Console.WriteLine("Swagger disponível em: https://localhost:7244/swagger");
 }
 else
 {
@@ -146,26 +143,29 @@ else
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinMind API v1");
-            c.RoutePrefix = "api-docs";
+            c.RoutePrefix = "swagger";
         });
     }
 }
 
-// Configurar CORS baseado no ambiente
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("AllowAll");
-}
-else
-{
-    app.UseCors("ProductionCors");
-}
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
+
+// Adicionar endpoint fallback para melhor mensagem de erro
+app.MapFallback(async context =>
+{
+    context.Response.StatusCode = 404;
+    await context.Response.WriteAsync("Endpoint não encontrado. Acesse /swagger para documentação da API.");
+});
+
+Console.WriteLine("FinMind API iniciada com sucesso!");
+Console.WriteLine($"URLs disponíveis:");
+Console.WriteLine($"   - API: https://localhost:7244");
+Console.WriteLine($"   - Swagger: https://localhost:7244/swagger");
+Console.WriteLine($"   - Health Check: https://localhost:7244/api/health");
 
 app.Run();
