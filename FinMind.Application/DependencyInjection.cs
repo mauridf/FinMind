@@ -12,7 +12,8 @@ public static class DependencyInjection
         services.AddScoped<CategoryService>();
         services.AddScoped<BudgetService>();
         services.AddScoped<GoalService>();
-        services.AddScoped<AuthService>(); // Adicionar AuthService
+        services.AddScoped<AuthService>();
+        services.AddScoped<DashboardService>();
 
         return services;
     }
