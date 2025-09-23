@@ -35,4 +35,34 @@ public class SeedController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    [HttpPost("reset")]
+    public async Task<ActionResult> ResetData()
+    {
+        // Permitir apenas em ambiente de desenvolvimento
+        if (!_environment.IsDevelopment())
+        {
+            return BadRequest(new { error = "Reset de dados permitido apenas em desenvolvimento" });
+        }
+
+        try
+        {
+            // Usar reflection para chamar método ClearAndSeedDataAsync se existir
+            var method = _seedService.GetType().GetMethod("ClearAndSeedDataAsync");
+            if (method != null)
+            {
+                await (Task)method.Invoke(_seedService, null);
+                return Ok(new { message = "Dados resetados e recriados com sucesso" });
+            }
+            else
+            {
+                await _seedService.SeedDataAsync();
+                return Ok(new { message = "Seed executado (dados mantidos se existirem)" });
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 }
