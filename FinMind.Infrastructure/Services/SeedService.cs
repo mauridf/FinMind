@@ -36,10 +36,8 @@ public class SeedService : ISeedService
             }
 
             Console.WriteLine("✅ Seed de dados concluído com sucesso!");
-            Console.WriteLine("👤 Usuários criados:");
-            Console.WriteLine("   - teste@finmind.com / Senha123! (Dados completos)");
-            Console.WriteLine("   - joao.silva@email.com / Senha123! (Dados moderados)");
-            Console.WriteLine("   - maria.santos@email.com / Senha123! (Dados básicos)");
+            Console.WriteLine("👤 Usuário criado:");
+            Console.WriteLine("   - mauridf@gmail.com / Mt190720@ (Dados completos)");
         }
         catch (Exception ex)
         {
@@ -84,20 +82,20 @@ public class SeedService : ISeedService
         {
             new User
             {
-                Email = "teste@finmind.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Senha123!"),
+                Email = "mauridf@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Mt190720@"),
                 PersonalInfo = new PersonalInfo
                 {
-                    Name = "Usuário Teste FinMind",
-                    CPF = "123.456.789-00",
-                    Phone = "(11) 99999-9999",
-                    BirthDate = new DateTime(1990, 5, 15)
+                    Name = "Maurício Dias de Carvalho Oliveira",
+                    CPF = "793.311.571-34",
+                    Phone = "(61) 99398-3844",
+                    BirthDate = new DateTime(1977, 8, 30)
                 },
                 FinancialSettings = new FinancialSettings
                 {
                     DefaultCurrency = "BRL",
-                    MonthlyIncome = 8500m,
-                    FinancialGoals = new List<string> { "Comprar um carro", "Viajar para Europa", "Fundo de emergência" }
+                    MonthlyIncome = 20500m,
+                    FinancialGoals = new List<string> { "Comprar um carro", "Quitar a Casa", "Fundo de emergência" }
                 },
                 Preferences = new UserPreferences
                 {
@@ -105,53 +103,17 @@ public class SeedService : ISeedService
                     Notifications = true,
                     Theme = "dark"
                 }
-            },
-            new User
-            {
-                Email = "joao.silva@email.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Senha123!"),
-                PersonalInfo = new PersonalInfo
-                {
-                    Name = "João Silva",
-                    CPF = "987.654.321-00",
-                    Phone = "(11) 98888-8888",
-                    BirthDate = new DateTime(1985, 8, 22)
-                },
-                FinancialSettings = new FinancialSettings
-                {
-                    DefaultCurrency = "BRL",
-                    MonthlyIncome = 5500m,
-                    FinancialGoals = new List<string> { "Comprar apartamento", "Pós-graduação" }
-                }
-            },
-            new User
-            {
-                Email = "maria.santos@email.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Senha123!"),
-                PersonalInfo = new PersonalInfo
-                {
-                    Name = "Maria Santos",
-                    CPF = "456.789.123-00",
-                    Phone = "(11) 97777-7777",
-                    BirthDate = new DateTime(1992, 3, 10)
-                },
-                FinancialSettings = new FinancialSettings
-                {
-                    DefaultCurrency = "BRL",
-                    MonthlyIncome = 4200m,
-                    FinancialGoals = new List<string> { "Viagem ao Nordeste" }
-                }
             }
         };
 
         await DB.SaveAsync(users);
-        Console.WriteLine($"✅ Criados {users.Count} usuários de exemplo");
+        Console.WriteLine($"Criado {users.Count} usuário de exemplo");
         return users;
     }
 
     private async Task CreateUserFinancialDataAsync(User user, List<Category> categories)
     {
-        Console.WriteLine($"📊 Criando dados financeiros para: {user.PersonalInfo.Name}");
+        Console.WriteLine($"Criando dados financeiros para: {user.PersonalInfo.Name}");
 
         // Criar transações dos últimos 6 meses
         await CreateSampleTransactionsAsync(user, categories);
@@ -165,7 +127,7 @@ public class SeedService : ISeedService
         // Criar categorias personalizadas
         await CreatePersonalCategoriesAsync(user);
 
-        Console.WriteLine($"✅ Dados financeiros criados para: {user.PersonalInfo.Name}");
+        Console.WriteLine($"Dados financeiros criados para: {user.PersonalInfo.Name}");
     }
 
     private async Task CreateSampleTransactionsAsync(User user, List<Category> categories)
@@ -177,7 +139,7 @@ public class SeedService : ISeedService
         // Diferentes perfis de gastos baseados no usuário
         var spendingProfile = user.Email switch
         {
-            "teste@finmind.com" => "high",       // Alto gasto - muitos dados
+            "mauridf@gmail.com" => "high",       // Alto gasto - muitos dados
             "joao.silva@email.com" => "medium",  // Médio gasto
             _ => "low"                           // Baixo gasto
         };
@@ -225,7 +187,7 @@ public class SeedService : ISeedService
         }
 
         await DB.SaveAsync(transactions);
-        Console.WriteLine($"   💰 Criadas {transactions.Count} transações para {user.PersonalInfo.Name}");
+        Console.WriteLine($"Criadas {transactions.Count} transações para {user.PersonalInfo.Name}");
     }
 
     private async Task CreateSampleBudgetsAsync(User user, List<Category> categories)
@@ -247,7 +209,7 @@ public class SeedService : ISeedService
             {
                 "Moradia" => 1500m,
                 "Alimentação" => 800m,
-                "Transporte" => 400m,
+                "Transporte" => 700m,
                 "Lazer" => 300m,
                 "Saúde" => 200m,
                 "Educação" => 250m,
@@ -256,7 +218,7 @@ public class SeedService : ISeedService
 
             // Ajustar baseado no perfil do usuário
             if (user.Email == "maria.santos@email.com") budgetAmount *= 0.7m;
-            if (user.Email == "teste@finmind.com") budgetAmount *= 1.3m;
+            if (user.Email == "mauridf@gmail.com") budgetAmount *= 1.3m;
 
             budgets.Add(new Budget
             {
@@ -271,7 +233,7 @@ public class SeedService : ISeedService
         }
 
         await DB.SaveAsync(budgets);
-        Console.WriteLine($"   📊 Criados {budgets.Count} orçamentos para {user.PersonalInfo.Name}");
+        Console.WriteLine($"Criados {budgets.Count} orçamentos para {user.PersonalInfo.Name}");
     }
 
     private async Task CreateSampleGoalsAsync(User user)
@@ -286,8 +248,8 @@ public class SeedService : ISeedService
         {
             var targetAmount = goalName.ToLower() switch
             {
-                var g when g.Contains("carro") => 35000m,
-                var g when g.Contains("europa") => 20000m,
+                var g when g.Contains("carro") => 60000m,
+                var g when g.Contains("casa") => 80000m,
                 var g when g.Contains("emergência") => 15000m,
                 var g when g.Contains("apartamento") => 80000m,
                 var g when g.Contains("graduação") => 12000m,
@@ -311,7 +273,7 @@ public class SeedService : ISeedService
         }
 
         await DB.SaveAsync(goals);
-        Console.WriteLine($"   🎯 Criadas {goals.Count} metas para {user.PersonalInfo.Name}");
+        Console.WriteLine($"Criadas {goals.Count} metas para {user.PersonalInfo.Name}");
     }
 
     private async Task CreatePersonalCategoriesAsync(User user)
@@ -337,7 +299,7 @@ public class SeedService : ISeedService
         };
 
         await DB.SaveAsync(personalCategories);
-        Console.WriteLine($"   🏷️  Criadas {personalCategories.Count} categorias personalizadas para {user.PersonalInfo.Name}");
+        Console.WriteLine($"Criadas {personalCategories.Count} categorias personalizadas para {user.PersonalInfo.Name}");
     }
 
     // Métodos auxiliares
@@ -432,12 +394,12 @@ public class SeedService : ISeedService
 
     public async Task ClearAndSeedDataAsync()
     {
-        Console.WriteLine("🧹 Limpando dados existentes...");
+        Console.WriteLine("Limpando dados existentes...");
 
         // Limpar todas as coleções (cuidado: isso apaga tudo!)
         await DB.Database("FinMind").Client.DropDatabaseAsync("FinMind");
 
-        Console.WriteLine("✅ Dados antigos removidos");
+        Console.WriteLine("Dados antigos removidos");
 
         // Executar seed novo
         await SeedDataAsync();
